@@ -1,0 +1,72 @@
+name: fab-agon-emulator
+base: core22
+version: '0.7.51'
+summary: Fab Agon Emulator
+description: |
+  Agon Light, Agon Light 2, Agon Console8 Emulator for Linux, Windows, any system with libSDL
+
+grade: stable
+confinement: strict
+
+compression: lzo
+
+architectures:
+  - build-on: amd64
+  - build-on: arm64
+  - build-on: armhf
+
+layout:
+  /usr/lib/$CRAFT_ARCH_TRIPLET/alsa-lib:
+    bind: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/alsa-lib
+
+parts:
+  alsa-pulseaudio:
+    plugin: dump
+    source: .
+    override-pull: |
+      mkdir etc -p
+      cat > etc/asound.conf <<EOF
+      pcm.!default {
+          type pulse
+          fallback "sysdefault"
+          hint {
+              show on
+              description "Default ALSA Output (currently PulseAudio Sound Server)"
+          }
+      }
+      ctl.!default {
+          type pulse
+          fallback "sysdefault"
+      }
+      EOF
+  fab-agon-emulator:
+    after: [alsa-pulseaudio]
+    plugin: rust
+    source: https://github.com/tomm/fab-agon-emulator/archive/refs/tags/0.7.5.tar.gz
+    stage-packages:
+      - libsdl2-2.0-0
+    build-packages:
+      - cargo
+      - libsdl2-dev
+    override-build: |
+      set -xeu
+      cargo build -v -r
+      mkdir "$SNAPCRAFT_PART_INSTALL"/bin
+      cp -a -r target/release/fab-agon-emulator "$SNAPCRAFT_PART_INSTALL"/bin
+      cp -a -r firmware "$SNAPCRAFT_PART_INSTALL"
+
+apps:
+  fab-agon-emulator:
+    extensions: [ gnome ]
+    command: bin/fab-agon-emulator --vdp $SNAP/firmware/vdp_console8.so  --mos $SNAP/firmware/mos_console8.bin 
+    environment:
+      ALSA_CONFIG_PATH: "$SNAP/etc/asound.conf"
+    plugs:
+      - joystick
+      - audio-playback
+      - audio-record
+      - alsa
+      - network
+      - network-bind
+      - home
+      - removable-media
