@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Fab Agon Emulator
+GenericName=Emulator
+Comment=Agon Light, Agon Light 2, Agon Console8 Emulator
+Exec=fab-agon-emulator
+Icon=${SNAP}/meta/gui/fab-agon-emulator.png
+Type=Application
+Categories=Game;Emulator;
+Keywords=Game;Emulator;Arcade;
+

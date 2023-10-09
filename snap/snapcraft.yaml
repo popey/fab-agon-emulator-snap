@@ -1,6 +1,6 @@
 name: fab-agon-emulator
 base: core22
-version: '0.7.51'
+adopt-info: fab-agon-emulator
 summary: Fab Agon Emulator
 description: |
   Agon Light, Agon Light 2, Agon Console8 Emulator for Linux, Windows, any system with libSDL
@@ -39,26 +39,47 @@ parts:
           fallback "sysdefault"
       }
       EOF
+  launcher:
+    plugin: dump
+    source: snap/local
   fab-agon-emulator:
     after: [alsa-pulseaudio]
     plugin: rust
-    source: https://github.com/tomm/fab-agon-emulator/archive/refs/tags/0.7.5.tar.gz
+    source: https://github.com/tomm/fab-agon-emulator.git
     stage-packages:
       - libsdl2-2.0-0
     build-packages:
       - cargo
       - libsdl2-dev
+    override-pull: |
+      craftctl default
+      last_committed_tag="$(git describe --tags --abbrev=0)"
+      echo $last_committed_tag
+      last_released_tag="$(snap info $SNAPCRAFT_PROJECT_NAME | awk '$1 == "latest/beta:" { print $2 }')"
+      echo $last_released_tag
+      # If the latest tag from the upstream project has not been released to
+      # beta, build that tag instead of master.
+      if [ "${last_committed_tag}" != "${last_released_tag}" ]; then
+        git fetch
+        git checkout "${last_committed_tag}"
+        echo "Setting version to $last_committed_tag"
+        craftctl set version="${last_committed_tag}"
+      else
+        echo "Setting version to $(git rev-parse --short HEAD)"
+        craftctl set version="$(git rev-parse --short HEAD)"
+      fi
     override-build: |
       set -xeu
       cargo build -v -r
       mkdir "$SNAPCRAFT_PART_INSTALL"/bin
       cp -a -r target/release/fab-agon-emulator "$SNAPCRAFT_PART_INSTALL"/bin
       cp -a -r firmware "$SNAPCRAFT_PART_INSTALL"
+      cp -a -r "$SNAPCRAFT_PART_SRC"/sdcard "$SNAPCRAFT_PART_INSTALL"
 
 apps:
   fab-agon-emulator:
     extensions: [ gnome ]
-    command: bin/fab-agon-emulator --vdp $SNAP/firmware/vdp_console8.so  --mos $SNAP/firmware/mos_console8.bin 
+    command: bin/launch
     environment:
       ALSA_CONFIG_PATH: "$SNAP/etc/asound.conf"
     plugs:
