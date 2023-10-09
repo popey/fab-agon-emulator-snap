@@ -13,4 +13,6 @@ if [ ! -d "$SNAP_USER_COMMON"/sdcard ]; then
   cp -a -r "$SNAP"/sdcard "$SNAP_USER_COMMON"
 fi
 
-"$SNAP"/bin/fab-agon-emulator --vdp "$SNAP_USER_COMMON"/firmware/vdp_console8.so  --mos "$SNAP_USER_COMMON"/firmware/mos_console8.bin --sdcard "$SNAP_USER_COMMON"/sdcard
+# Change to the folder where the firmware and sd card is
+cd "$SNAP_USER_COMMON"
+"$SNAP"/bin/fab-agon-emulator "$@"
