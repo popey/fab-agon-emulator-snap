@@ -1,9 +1,14 @@
 #!/bin/bash
 
+# Copy firmware into writable areas in case the
+# user wishes to easily replace them with modified
+# versions
 if [ ! -d "$SNAP_USER_COMMON"/firmware ]; then
   cp -a -r "$SNAP"/firmware "$SNAP_USER_COMMON"
 fi
 
+# We copy the sd card to the writable area so it's
+# easy for users to add files to the 'card'
 if [ ! -d "$SNAP_USER_COMMON"/sdcard ]; then
   cp -a -r "$SNAP"/sdcard "$SNAP_USER_COMMON"
 fi
