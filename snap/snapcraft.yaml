@@ -42,6 +42,19 @@ parts:
   launcher:
     plugin: dump
     source: snap/local
+  examples:
+    plugin: dump
+    after: [fab-agon-emulator]
+    source: https://github.com/TheByteAttic/AgonLight.git
+    source-subdir: "uSD card files"
+    organize:
+      examples: sdcard/examples
+      tests: sdcard/tests
+      resources: sdcard/resources
+    prime:
+     - -bbcbasic.bin
+     - -autoexec.txt
+     - -README.md
   fab-agon-emulator:
     after: [alsa-pulseaudio]
     plugin: rust
