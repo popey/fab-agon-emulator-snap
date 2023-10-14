@@ -42,6 +42,29 @@ parts:
   launcher:
     plugin: dump
     source: snap/local
+  agon-bas:
+    plugin: dump
+    after: [fab-agon-emulator]
+    source: https://github.com/pngwen/agon-bas.git
+    organize:
+      "*.BAS": sdcard/agon-bas/
+      "*.BBC": sdcard/agon-bas/
+      README.MD: sdcard/agon-bas/
+  pizza-dash:
+    plugin: dump
+    after: [fab-agon-emulator]
+    source: https://github.com/NicholasPratt/Pizza-Dash.git
+    organize:
+      PIZZADASH.BAS: sdcard/Pizza-Dash/
+      README.md: sdcard/Pizza-Dash/
+  nova-star:
+    plugin: dump
+    after: [fab-agon-emulator]
+    source: https://github.com/NicholasPratt/Nova-Star.git
+    organize:
+      NOVASTAR.BAS: sdcard/Nova-Star/
+      LICENSE: sdcard/Nova-Star/
+      README.md: sdcard/Nova-Star/
   examples:
     plugin: dump
     after: [fab-agon-emulator]
