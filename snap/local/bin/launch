@@ -3,7 +3,7 @@
 # Copy firmware into writable areas in case the
 # user wishes to easily replace them with modified
 # versions
-if [ ! -d "$SNAP_USER_COMMON"/firmware ]; then
+if [ ! -z "$SNAP_USER_COMMON"/firmware/vdp_quark104.so ]; then
   cp -a -r "$SNAP"/firmware "$SNAP_USER_COMMON"
 fi
 
@@ -15,4 +15,4 @@ fi
 
 # Change to the folder where the firmware and sd card is
 cd "$SNAP_USER_COMMON"
-"$SNAP"/bin/fab-agon-emulator "$@"
+"$SNAP"/usr/bin/fab-agon-emulator "$@"
