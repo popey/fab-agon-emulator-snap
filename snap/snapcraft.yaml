@@ -80,13 +80,14 @@ parts:
      - -README.md
   fab-agon-emulator:
     after: [alsa-pulseaudio]
-    plugin: make
+    plugin: rust
     source: https://github.com/tomm/fab-agon-emulator.git
     stage-packages:
       - libsdl2-2.0-0
     build-packages:
       - cargo
       - libsdl2-dev
+      - make
     override-pull: |
       craftctl default
       last_committed_tag="$(git describe --tags --abbrev=0)"
@@ -106,9 +107,11 @@ parts:
       fi
     override-build: |
       set -xeu
+      curl https://sh.rustup.rs -sSf | sh -s -- -y
+      rustup default nightly
+      git submodule update --init
       make
       ls -l
-      #cargo build -v -r
       install fab-agon-emulator "$SNAPCRAFT_PART_INSTALL"/usr/bin
       cp -a -r firmware "$SNAPCRAFT_PART_INSTALL"
       cp -a -r "$SNAPCRAFT_PART_SRC"/sdcard "$SNAPCRAFT_PART_INSTALL"
