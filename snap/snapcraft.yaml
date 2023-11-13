@@ -97,7 +97,7 @@ parts:
      - -autoexec.txt
      - -README.md
   fab-agon-emulator:
-    after: [alsa-pulseaudio rustup]
+    after: [alsa-pulseaudio,rustup]
     plugin: rust
     source: https://github.com/tomm/fab-agon-emulator.git
     stage-packages:
