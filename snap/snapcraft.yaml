@@ -20,6 +20,24 @@ layout:
     bind: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/alsa-lib
 
 parts:
+  rustup:
+    plugin: nil
+    build-packages: [wget]
+    build-environment:
+      - RUSTUP_HOME: $CRAFT_PART_INSTALL/usr/share/rust
+      - CARGO_HOME: $CRAFT_PART_INSTALL/usr/share/rust
+      - CARGO_BUILD_JOBS: $CRAFT_PARALLEL_BUILD_COUNT
+    override-pull: |
+      wget https://sh.rustup.rs -O $CRAFT_PART_SRC/rustup-init.sh
+      chmod +x $CRAFT_PART_SRC/rustup-init.sh
+    override-build: |
+      $CRAFT_PART_SRC/rustup-init.sh -y --no-modify-path
+      mkdir -p $CRAFT_PART_INSTALL/usr/bin
+      for i in `ls $RUSTUP_HOME/bin/`; do
+        ln -s ../share/rust/bin/$i $CRAFT_PART_INSTALL/usr/bin/$i
+      done
+    override-prime: |
+      echo 'Skip Prime'
   alsa-pulseaudio:
     plugin: dump
     source: .
@@ -79,7 +97,7 @@ parts:
      - -autoexec.txt
      - -README.md
   fab-agon-emulator:
-    after: [alsa-pulseaudio]
+    after: [alsa-pulseaudio rustup]
     plugin: rust
     source: https://github.com/tomm/fab-agon-emulator.git
     stage-packages:
@@ -107,8 +125,6 @@ parts:
       fi
     override-build: |
       set -xeu
-      curl https://sh.rustup.rs -sSf | sh -s -- -y
-      rustup default nightly
       git submodule update --init
       make
       ls -l
