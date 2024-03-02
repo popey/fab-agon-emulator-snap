@@ -15,4 +15,4 @@ fi
 
 # Change to the folder where the firmware and sd card is
 cd "$SNAP_USER_COMMON"
-"$SNAP"/usr/bin/fab-agon-emulator "$@"
+"$SNAP"/bin/fab-agon-emulator "$@"
