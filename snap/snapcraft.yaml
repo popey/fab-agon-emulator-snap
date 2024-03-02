@@ -20,24 +20,6 @@ layout:
     bind: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/alsa-lib
 
 parts:
-  rustup:
-    plugin: nil
-    build-packages: [wget]
-    build-environment:
-      - RUSTUP_HOME: $CRAFT_PART_INSTALL/usr/share/rust
-      - CARGO_HOME: $CRAFT_PART_INSTALL/usr/share/rust
-      - CARGO_BUILD_JOBS: $CRAFT_PARALLEL_BUILD_COUNT
-    override-pull: |
-      wget https://sh.rustup.rs -O $CRAFT_PART_SRC/rustup-init.sh
-      chmod +x $CRAFT_PART_SRC/rustup-init.sh
-    override-build: |
-      $CRAFT_PART_SRC/rustup-init.sh -y --no-modify-path
-      mkdir -p $CRAFT_PART_INSTALL/usr/bin
-      for i in `ls $RUSTUP_HOME/bin/`; do
-        ln -s ../share/rust/bin/$i $CRAFT_PART_INSTALL/usr/bin/$i
-      done
-    override-prime: |
-      echo 'Skip Prime'
   alsa-pulseaudio:
     plugin: dump
     source: .
@@ -97,7 +79,7 @@ parts:
      - -autoexec.txt
      - -README.md
   fab-agon-emulator:
-    after: [alsa-pulseaudio,rustup]
+    after: [alsa-pulseaudio]
     plugin: rust
     source: https://github.com/tomm/fab-agon-emulator.git
     stage-packages:
@@ -105,7 +87,6 @@ parts:
     build-packages:
       - cargo
       - libsdl2-dev
-      - make
     override-pull: |
       craftctl default
       last_committed_tag="$(git describe --tags --abbrev=0)"
@@ -125,12 +106,14 @@ parts:
       fi
     override-build: |
       set -xeu
-      git submodule update --init
+      FORCE=1 cargo build -v -r
       make
-      ls -l
-      install fab-agon-emulator "$SNAPCRAFT_PART_INSTALL"/usr/bin
+      mkdir "$SNAPCRAFT_PART_INSTALL"/bin
+      cp -a -r target/release/fab-agon-emulator "$SNAPCRAFT_PART_INSTALL"/bin
       cp -a -r firmware "$SNAPCRAFT_PART_INSTALL"
       cp -a -r "$SNAPCRAFT_PART_SRC"/sdcard "$SNAPCRAFT_PART_INSTALL"
+    prime:
+      - -usr/lib/x86_64-linux-gnu/libpulse-simple.so.0.1.1
 
 apps:
   fab-agon-emulator:
