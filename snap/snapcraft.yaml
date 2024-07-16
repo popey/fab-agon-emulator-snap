@@ -1,5 +1,5 @@
 name: fab-agon-emulator
-base: core22
+base: core24
 adopt-info: fab-agon-emulator
 summary: Fab Agon Emulator
 description: |
@@ -10,10 +10,16 @@ confinement: strict
 
 compression: lzo
 
-architectures:
-  - build-on: amd64
-  - build-on: arm64
-  - build-on: armhf
+platforms:
+  amd64:
+    build-on: [amd64]
+    build-for: [amd64]
+  arm64:
+    build-on: [arm64]
+    build-for: [arm64]
+  armhf:
+    build-on: [armhf]
+    build-for: [armhf]
 
 layout:
   /usr/lib/$CRAFT_ARCH_TRIPLET/alsa-lib:
