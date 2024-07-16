@@ -4,7 +4,9 @@ on:
   push:
     branches:
       - master
-
+env:
+  SNAPCRAFT_ENABLE_EXPERIMENTAL_EXTENSIONS: 1
+  
 jobs:
   snap:
     runs-on: ubuntu-latest
