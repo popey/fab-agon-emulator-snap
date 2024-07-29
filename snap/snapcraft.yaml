@@ -1,6 +1,6 @@
 name: fab-agon-emulator
 base: core24
-adopt-info: fab-agon-emulator
+version: 0.9.55
 summary: Fab Agon Emulator
 description: |
   Agon Light, Agon Light 2, Agon Console8 Emulator for Linux, Windows, any system with libSDL
@@ -87,29 +87,12 @@ parts:
   fab-agon-emulator:
     after: [alsa-pulseaudio]
     plugin: rust
-    source: https://github.com/tomm/fab-agon-emulator.git
+    source: https://github.com/tomm/fab-agon-emulator/archive/refs/tags/$SNAPCRAFT_PROJECT_VERSION.tar.gz
     stage-packages:
       - libsdl2-2.0-0
     build-packages:
       - cargo
       - libsdl2-dev
-    override-pull: |
-      craftctl default
-      last_committed_tag="$(git describe --tags --abbrev=0)"
-      echo $last_committed_tag
-      last_released_tag="$(snap info $SNAPCRAFT_PROJECT_NAME | awk '$1 == "latest/beta:" { print $2 }')"
-      echo $last_released_tag
-      # If the latest tag from the upstream project has not been released to
-      # beta, build that tag instead of master.
-      if [ "${last_committed_tag}" != "${last_released_tag}" ]; then
-        git fetch
-        git checkout "${last_committed_tag}"
-        echo "Setting version to $last_committed_tag"
-        craftctl set version="${last_committed_tag}"
-      else
-        echo "Setting version to $(git rev-parse --short HEAD)"
-        craftctl set version="$(git rev-parse --short HEAD)"
-      fi
     override-build: |
       set -xeu
       FORCE=1 cargo build -v -r
