@@ -88,7 +88,6 @@ parts:
     after: [alsa-pulseaudio]
     plugin: rust
     source: https://github.com/tomm/fab-agon-emulator.git
-    source-tag: $SNAPCRAFT_PROJECT_VERSION
     stage-packages:
       - libsdl2-2.0-0
     build-packages:
@@ -96,6 +95,7 @@ parts:
       - libsdl2-dev
     override-build: |
       set -xeu
+      git checkout "$SNAPCRAFT_PROJECT_VERSION"
       FORCE=1 cargo build -v -r
       make
       mkdir "$SNAPCRAFT_PART_INSTALL"/bin
