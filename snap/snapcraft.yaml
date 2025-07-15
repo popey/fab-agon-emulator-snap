@@ -1,6 +1,6 @@
 name: fab-agon-emulator
 base: core24
-version: 0.9.96
+version: "0.9.96"
 summary: Fab Agon Emulator
 description: |
   Agon Light, Agon Light 2, Agon Console8 Emulator for Linux, Windows, any system with libSDL
@@ -9,17 +9,6 @@ grade: stable
 confinement: strict
 
 compression: lzo
-
-platforms:
-  amd64:
-    build-on: [amd64]
-    build-for: [amd64]
-  arm64:
-    build-on: [arm64]
-    build-for: [arm64]
-  armhf:
-    build-on: [armhf]
-    build-for: [armhf]
 
 layout:
   /usr/lib/$CRAFT_ARCH_TRIPLET/alsa-lib:
@@ -86,22 +75,33 @@ parts:
      - -README.md
   fab-agon-emulator:
     after: [alsa-pulseaudio]
-    plugin: rust
+    plugin: nil
     source: https://github.com/tomm/fab-agon-emulator.git
+    source-tag: $SNAPCRAFT_PROJECT_VERSION
     stage-packages:
       - libsdl2-2.0-0
     build-packages:
-      - cargo
       - libsdl2-dev
+      - wget
+    build-snaps:
+      - rustup
+    override-pull: |
+      set -xeu
+      craftctl default
+      #git submodule update --init --recursive
     override-build: |
       set -xeu
-      git checkout "$SNAPCRAFT_PROJECT_VERSION"
-      FORCE=1 cargo build -v -r
+      # Bodge to grab the firmware because the release came out without it
+      wget "https://github.com/tomm/fab-agon-emulator/raw/refs/heads/main/firmware/mos_platform.bin" -O "$SNAPCRAFT_PART_SRC"/firmware/mos_platform.bin
+      wget "https://github.com/tomm/fab-agon-emulator/raw/refs/heads/main/firmware/mos_platform.map" -O "$SNAPCRAFT_PART_SRC"/firmware/mos_platform.map
+      /snap/bin/rustup default nightly
+      cargobin=$HOME/.rustup/toolchains/$(rustup toolchain list | grep nightly | cut -d' ' -f1)/bin/cargo
+      FORCE=1 $cargobin build -v -r
       make
       mkdir "$SNAPCRAFT_PART_INSTALL"/bin
-      cp -a -r target/release/fab-agon-emulator "$SNAPCRAFT_PART_INSTALL"/bin
-      cp -a -r firmware "$SNAPCRAFT_PART_INSTALL"
-      cp -a -r "$SNAPCRAFT_PART_SRC"/sdcard "$SNAPCRAFT_PART_INSTALL"
+      cp -a -v -r target/release/fab-agon-emulator "$SNAPCRAFT_PART_INSTALL"/bin
+      cp -a -v -r "$SNAPCRAFT_PART_SRC"/firmware "$SNAPCRAFT_PART_INSTALL"
+      cp -a -v -r "$SNAPCRAFT_PART_SRC"/sdcard "$SNAPCRAFT_PART_INSTALL"
     prime:
       - -usr/lib/x86_64-linux-gnu/libpulse-simple.so.0.1.1
 
