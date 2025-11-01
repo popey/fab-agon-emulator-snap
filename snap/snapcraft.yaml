@@ -102,6 +102,7 @@ parts:
       cp -a -v -r target/release/fab-agon-emulator "$SNAPCRAFT_PART_INSTALL"/bin
       cp -a -v -r "$SNAPCRAFT_PART_SRC"/firmware "$SNAPCRAFT_PART_INSTALL"
       cp -a -v -r "$SNAPCRAFT_PART_SRC"/sdcard "$SNAPCRAFT_PART_INSTALL"
+      cp firmware/vdp_*.so "$SNAPCRAFT_PART_INSTALL"/firmware
     prime:
       - -usr/lib/x86_64-linux-gnu/libpulse-simple.so.0.1.1
 
