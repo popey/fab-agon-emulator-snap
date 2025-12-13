@@ -9,7 +9,9 @@ grade: stable
 confinement: strict
 
 platforms:
-  build-for: [amd64, arm64, armhf]
+  amd64:
+  arm64:
+  armhf:
 
 compression: lzo
 
