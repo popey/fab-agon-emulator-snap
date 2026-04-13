@@ -1,4 +1,5 @@
 # fab-agon-emulator-snap
+[![fab-agon-emulator](https://github.com/popey/fab-agon-emulator-snap/actions/workflows/test-snap-can-build.yml/badge.svg)](https://github.com/popey/fab-agon-emulator-snap/actions)
 ## Snap of the Fab Agon Emulator
 
 [![fab-agon-emulator](https://snapcraft.io/fab-agon-emulator/badge.svg)](https://snapcraft.io/fab-agon-emulator)
