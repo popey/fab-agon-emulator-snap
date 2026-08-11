@@ -118,7 +118,6 @@ parts:
       - wget
       - build-essential
       - libudev-dev
-    build-snaps:
       - rustup
     override-pull: |
       set -xeu
@@ -129,9 +128,8 @@ parts:
       # Bodge to grab the firmware because the release came out without it
       wget "https://github.com/tomm/fab-agon-emulator/raw/refs/heads/main/firmware/mos_platform.bin" -O "$SNAPCRAFT_PART_SRC"/firmware/mos_platform.bin
       wget "https://github.com/tomm/fab-agon-emulator/raw/refs/heads/main/firmware/mos_platform.map" -O "$SNAPCRAFT_PART_SRC"/firmware/mos_platform.map
-      /snap/bin/rustup toolchain install nightly --force
-      /snap/bin/rustup default nightly
-      export PATH="$HOME/.rustup/toolchains/$(/snap/bin/rustup toolchain list | grep nightly | cut -d' ' -f1)/bin:$PATH"
+      rustup toolchain install nightly --profile minimal --no-self-update
+      export PATH="$HOME/.rustup/toolchains/$(rustup toolchain list | grep nightly | cut -d' ' -f1)/bin:$PATH"
       # Staged SDL3 library isn't in the default linker search path
       export LIBRARY_PATH="${CRAFT_STAGE}/usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}${LIBRARY_PATH:+:$LIBRARY_PATH}"
       make
