@@ -16,8 +16,8 @@ platforms:
 compression: lzo
 
 layout:
-  /usr/lib/$CRAFT_ARCH_TRIPLET/alsa-lib:
-    bind: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/alsa-lib
+  /usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/alsa-lib:
+    bind: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/alsa-lib
 
 parts:
   alsa-pulseaudio:
@@ -77,6 +77,7 @@ parts:
     plugin: dump
     after: [fab-agon-emulator]
     source: https://github.com/pngwen/agon-bas.git
+    source-commit: 3b84d291cc61cd8f06a10c08a2e1a31f54f41c89
     organize:
       "*.BAS": sdcard/agon-bas/
       "*.BBC": sdcard/agon-bas/
@@ -85,6 +86,7 @@ parts:
     plugin: dump
     after: [fab-agon-emulator]
     source: https://github.com/NicholasPratt/Pizza-Dash.git
+    source-commit: a26e354a02eabcaa95cf6156105da9d42e871adb
     organize:
       PIZZADASH.BAS: sdcard/Pizza-Dash/
       README.md: sdcard/Pizza-Dash/
@@ -92,6 +94,7 @@ parts:
     plugin: dump
     after: [fab-agon-emulator]
     source: https://github.com/NicholasPratt/Nova-Star.git
+    source-commit: 518f9f6ebb9d58f0757e4ca8c0a8cb14d5a826ad
     organize:
       NOVASTAR.BAS: sdcard/Nova-Star/
       LICENSE: sdcard/Nova-Star/
@@ -100,6 +103,7 @@ parts:
     plugin: dump
     after: [fab-agon-emulator]
     source: https://github.com/TheByteAttic/AgonLight.git
+    source-commit: fbbc08ebce710eea67505c82ad83f431ad30b9f6
     source-subdir: "uSD card files"
     organize:
       examples: sdcard/examples
@@ -113,7 +117,7 @@ parts:
     after: [alsa-pulseaudio, sdl3]
     plugin: nil
     source: https://github.com/tomm/fab-agon-emulator.git
-    source-tag: $SNAPCRAFT_PROJECT_VERSION
+    source-tag: $CRAFT_PROJECT_VERSION
     build-packages:
       - wget
       - build-essential
@@ -125,19 +129,16 @@ parts:
       git submodule update --init --recursive
     override-build: |
       set -xeu
-      # Bodge to grab the firmware because the release came out without it
-      wget "https://github.com/tomm/fab-agon-emulator/raw/refs/heads/main/firmware/mos_platform.bin" -O "$SNAPCRAFT_PART_SRC"/firmware/mos_platform.bin
-      wget "https://github.com/tomm/fab-agon-emulator/raw/refs/heads/main/firmware/mos_platform.map" -O "$SNAPCRAFT_PART_SRC"/firmware/mos_platform.map
       rustup toolchain install nightly --profile minimal --no-self-update
       export PATH="$HOME/.rustup/toolchains/$(rustup toolchain list | grep nightly | cut -d' ' -f1)/bin:$PATH"
       # Staged SDL3 library isn't in the default linker search path
       export LIBRARY_PATH="${CRAFT_STAGE}/usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}${LIBRARY_PATH:+:$LIBRARY_PATH}"
       make
-      mkdir -p "$SNAPCRAFT_PART_INSTALL"/bin
-      cp -a -v -r target/release/fab-agon-emulator "$SNAPCRAFT_PART_INSTALL"/bin
-      cp -a -v -r "$SNAPCRAFT_PART_SRC"/firmware "$SNAPCRAFT_PART_INSTALL"
-      cp -a -v -r "$SNAPCRAFT_PART_SRC"/sdcard "$SNAPCRAFT_PART_INSTALL"
-      cp firmware/vdp_*.so "$SNAPCRAFT_PART_INSTALL"/firmware
+      mkdir -p "$CRAFT_PART_INSTALL"/bin
+      cp -a -v -r target/release/fab-agon-emulator "$CRAFT_PART_INSTALL"/bin
+      cp -a -v -r "$CRAFT_PART_SRC"/firmware "$CRAFT_PART_INSTALL"
+      cp -a -v -r "$CRAFT_PART_SRC"/sdcard "$CRAFT_PART_INSTALL"
+      cp firmware/vdp_*.so "$CRAFT_PART_INSTALL"/firmware
 
 apps:
   fab-agon-emulator:
