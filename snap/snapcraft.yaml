@@ -122,13 +122,22 @@ parts:
       - wget
       - build-essential
       - libudev-dev
-      - rustup
+      - on amd64: [rustup]
+      - on arm64: [rustup]
     override-pull: |
       set -xeu
       craftctl default
       git submodule update --init --recursive
     override-build: |
       set -xeu
+      if [ "$CRAFT_ARCH_BUILD_FOR" = armhf ]; then
+        # Noble has no rustup package for armhf. Use the pinned official bootstrap.
+        wget -O rustup-init https://static.rust-lang.org/rustup/archive/1.29.2/armv7-unknown-linux-gnueabihf/rustup-init
+        echo 'fb8cc6c0ff713fd405a6940c80138516da9b75e6649e280cb65342afa3dcf188  rustup-init' | sha256sum -c -
+        chmod +x rustup-init
+        ./rustup-init -y --no-modify-path --default-toolchain none
+        export PATH="$HOME/.cargo/bin:$PATH"
+      fi
       rustup toolchain install nightly --profile minimal --no-self-update
       export PATH="$HOME/.rustup/toolchains/$(rustup toolchain list | grep nightly | cut -d' ' -f1)/bin:$PATH"
       # Staged SDL3 library isn't in the default linker search path
