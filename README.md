@@ -44,3 +44,17 @@ ADVANCED:
   --mos PATH            Use a different MOS.bin firmware
   --vdp PATH            Use a different VDP dll/so firmware
 ```
+
+### Saved firmware after an emulator update
+
+The launcher keeps your writable firmware and SD-card files in
+`~/snap/fab-agon-emulator/common/`. If a saved VDP library cannot provide the
+interface required by the emulator, the launcher uses the matching bundled VDP
+for that run and prints a diagnostic. It does not overwrite the saved library,
+MOS firmware, or SD-card files. Compatible custom VDP libraries remain in use.
+An explicit `--vdp PATH` override is passed through unchanged.
+
+Launcher regressions: `python3 -m unittest discover -s tests -v` (requires a C
+compiler). The installed upgrade regression runs only in a disposable ghvmctl
+VM; it simulates the missing `vdp_set_printer_file` export and checks two real
+launches while verifying saved-file hashes.
