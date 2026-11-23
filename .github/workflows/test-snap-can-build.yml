@@ -20,6 +20,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Test launcher compatibility and user-data preservation
+        run: python3 -m unittest discover -s tests -v
+
       - name: Build snap
         uses: snapcore/action-build@v1
         id: build
@@ -89,6 +92,13 @@ jobs:
           ghvmctl screenshot-full
           ghvmctl screenshot-window
           ls -lh "$HOME/ghvmctl-screenshots/"
+
+      - name: Check installed upgrade with incompatible saved VDP
+        run: |
+          ghvmctl snap-terminate fab-agon-emulator.fab-agon-emulator
+          VM_NAME=$(ghvmctl exec -- hostname | tr -d '[:space:]')
+          lxc file push tests/check-installed-upgrade.py "local:$VM_NAME/home/ubuntu/check-installed-upgrade.py"
+          ghvmctl exec -- python3 /home/ubuntu/check-installed-upgrade.py
 
       - name: Output app logs
         if: always()
