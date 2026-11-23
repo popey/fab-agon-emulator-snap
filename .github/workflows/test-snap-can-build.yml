@@ -84,8 +84,9 @@ jobs:
 
       - name: Launch app and wait for it to render
         run: |
-          ghvmctl snap-run fab-agon-emulator.fab-agon-emulator
+          ghvmctl snap-run fab-agon-emulator
           sleep 30
+          ghvmctl snap-is-running fab-agon-emulator
 
       - name: Take screenshots
         run: |
@@ -95,7 +96,7 @@ jobs:
 
       - name: Check installed upgrade with incompatible saved VDP
         run: |
-          ghvmctl snap-terminate fab-agon-emulator.fab-agon-emulator
+          ghvmctl snap-terminate fab-agon-emulator
           VM_NAME=$(ghvmctl exec -- hostname | tr -d '[:space:]')
           lxc file push tests/check-installed-upgrade.py "local:$VM_NAME/home/ubuntu/check-installed-upgrade.py"
           ghvmctl exec -- python3 /home/ubuntu/check-installed-upgrade.py
@@ -118,7 +119,7 @@ jobs:
 
       - name: Output app logs
         if: always()
-        run: ghvmctl exec -- cat /home/ubuntu/fab-agon-emulator.fab-agon-emulator.log 2>/dev/null || true
+        run: ghvmctl exec -- cat /home/ubuntu/fab-agon-emulator.log 2>/dev/null || true
 
       - name: Upload screenshots
         uses: actions/upload-artifact@v4
