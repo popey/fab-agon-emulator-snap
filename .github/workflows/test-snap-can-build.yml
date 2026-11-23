@@ -100,6 +100,22 @@ jobs:
           lxc file push tests/check-installed-upgrade.py "local:$VM_NAME/home/ubuntu/check-installed-upgrade.py"
           ghvmctl exec -- python3 /home/ubuntu/check-installed-upgrade.py
 
+      - name: Collect upgrade regression evidence
+        if: always()
+        run: |
+          VM_NAME=$(ghvmctl exec -- hostname | tr -d '[:space:]')
+          mkdir -p artifacts
+          lxc file pull -r "local:$VM_NAME/home/ubuntu/repository-tests/artifacts/upgrade" artifacts/ || true
+
+      - name: Upload upgrade regression evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: upgrade-regression-evidence
+          path: artifacts/upgrade/
+          if-no-files-found: warn
+          retention-days: 14
+
       - name: Output app logs
         if: always()
         run: ghvmctl exec -- cat /home/ubuntu/fab-agon-emulator.fab-agon-emulator.log 2>/dev/null || true

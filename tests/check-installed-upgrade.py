@@ -7,14 +7,13 @@ from pathlib import Path
 import shutil
 import signal
 import subprocess
-import tempfile
 import time
 
 assert Path.home() == Path('/home/ubuntu') and Path('/bin/ghvmctl-runner').exists(), 'Disposable ghvmctl guest required'
 name = 'fab-agon-emulator'
 common = Path.home() / 'snap' / name / 'common'
 installed = Path('/snap') / name / 'current'
-report = Path.cwd() / 'artifacts/upgrade'
+report = Path('/home/ubuntu/repository-tests/artifacts/upgrade')
 report.mkdir(parents=True, exist_ok=True)
 # Initialize a fresh profile if CI has not launched yet.
 subprocess.run(['/snap/bin/' + name, '--help'], check=True, stdout=subprocess.DEVNULL)

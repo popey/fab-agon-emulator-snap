@@ -92,6 +92,9 @@ class LauncherTests(unittest.TestCase):
     def test_missing_variant_uses_compatible_saved_console8(self):
         self.seed()
         self.assertEqual(json.loads(self.launch('--firmware', 'fb').stdout), ['--firmware', 'fb'])
+        self.compile(self.common / 'firmware/vdp_console8.so', [s for s in selector.REQUIRED if s != 'vdp_set_printer_file'])
+        self.assertEqual(json.loads(self.launch('--firmware', 'fb').stdout),
+                         ['--vdp', str(self.snap / 'firmware/vdp_console8.so'), '--firmware', 'fb'])
 
     def test_broken_bundled_library_fails_without_touching_data(self):
         self.seed()
